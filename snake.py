@@ -12,6 +12,7 @@ FOOD_COLOR = "#FF0000"
 BACKGROUND_COLOR = "#000000"
 score = 0
 direction = 'down'
+plays = 0
 
 
 
@@ -150,6 +151,8 @@ def ResetGame():
 
 def GameOver():
 
+    global plays    
+
     canvas.delete(ALL)
     
     tempwidth = canvas.winfo_width()/2
@@ -157,8 +160,14 @@ def GameOver():
     
     canvas.create_text(tempwidth, (tempheight)-190, font=('Comic Sans MS',70), text="GAME OVER", fill="red", tag="gameover")
     
+    
     PlayAgain = Button(window, text="Play Again", font=('Comic Sans MS', 40), command=ResetGame, bg="gray", fg="red")
     canvas.create_window(tempwidth, tempheight, window=PlayAgain)
+    
+    if plays == 0:
+        plays +=1
+        instruction = Label(window, text="Press esc to close the game!\nPress f to enter full screen!")
+        instruction.pack(side=BOTTOM)
     
 
 def InGame():
@@ -173,9 +182,6 @@ def InGame():
         
     canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
     canvas.pack()
-    
-    instructions = Label(window, text="Press esc to close the game!\nPress f to enter full screen!")
-    instructions.pack(side=BOTTOM)
     
         
     window.update()
@@ -209,12 +215,37 @@ window.bind('<f>', lambda event: window.attributes('-fullscreen', True))
 
 
 GameName = Label(window, text="Snake Game", font=('Comic Sans MS',70), fg="red")
-GameName.pack()
+GameName.pack(pady=(50,0))
 
 ProducedBy = Label(window, text="produced by Makram Kordab", font=('Arial',20))
 ProducedBy.pack()
 
-PlayNow = Button(window, text="Play Now", font=('Comic Sans MS', 70), command=InGame, bg="black", fg="red", activebackground="gray", activeforeground="white")
-PlayNow.pack()
+
+#here i want to give the users a hint about the game    canvas.winfo_width() / 2
+idea = Canvas(window, width=GAME_WIDTH, height=SPACE_SIZE*3)
+idea.pack()
+idea.update_idletasks()
+
+canvas_width = idea.winfo_width()
+canvas_height = idea.winfo_height()
+
+circle_diameter = 40
+circle_radius = circle_diameter / 2
+
+bottom_right_x = canvas_width - circle_radius
+bottom_right_y = canvas_height - circle_radius
+
+idea.create_oval(GAME_WIDTH/2 +100 , SPACE_SIZE * 3 - 40, GAME_WIDTH/2+140, SPACE_SIZE * 3, fill=FOOD_COLOR)
+idea.create_rectangle(GAME_WIDTH/2-60, SPACE_SIZE * 3 - 40, GAME_WIDTH/2-20, SPACE_SIZE * 3, fill=SNAKE_COLOR)
+idea.create_rectangle(GAME_WIDTH/2-100, SPACE_SIZE * 3 - 40, GAME_WIDTH/2-60, SPACE_SIZE * 3, fill=SNAKE_COLOR)
+idea.create_rectangle(GAME_WIDTH/2-140, SPACE_SIZE * 3 - 40, GAME_WIDTH/2-100, SPACE_SIZE * 3, fill=SNAKE_COLOR)
+
+
+
+instructions = Label(window, text="Press esc to close the game!\nPress f to enter full screen!")
+instructions.pack(side=BOTTOM)
+
+PlayNow = Button(window, text="Play Now", font=('Comic Sans MS', 40), command=InGame, bg="black", fg="red", activebackground="gray", activeforeground="white")
+PlayNow.pack(side=BOTTOM, pady=(0,50))
 
 window.mainloop()
