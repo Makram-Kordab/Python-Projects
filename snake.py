@@ -1,9 +1,10 @@
 from tkinter import *
 import random
+import time
 
 GAME_WIDTH = 800
 GAME_HEIGHT = 600
-SPEED = 200
+SPEED = 100
 SPACE_SIZE = 40
 BODY_PARTS = 3
 SNAKE_COLOR = "#00FF00"
@@ -12,6 +13,7 @@ BACKGROUND_COLOR = "#000000"
 score = 0
 direction = 'down'
 HighScore = 0
+
 
 
 class Snake:
@@ -39,6 +41,17 @@ class Food:
         self.coordinates = [x, y]
 
         canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=FOOD_COLOR, tag="food")
+
+
+def CountDown(sec=3):
+    if sec > 0:
+        canvas.delete("all")
+        canvas.create_text(canvas.winfo_width() / 2, canvas.winfo_height() / 2,
+                           text=str(sec), font=('Comic Sans MS', 120), fill="red")
+        window.after(1000, CountDown, sec - 1)
+    elif sec == 0:
+        canvas.delete("all")
+        StartGame()
 
 
 def NextTurn(snake, food):
@@ -121,6 +134,11 @@ def CheckCollisions(snake):
     return False
 
 
+def StartGame():
+    snake = Snake()
+    food = Food()
+    NextTurn(snake, food)
+
 def ResetGame():
     global score, direction, snake, food, HighScore
     
@@ -131,9 +149,7 @@ def ResetGame():
     direction = 'down'
     
     canvas.delete(ALL)
-    snake = Snake()
-    food = Food()
-    NextTurn(snake, food)
+    CountDown(3)
 
 def GameOver():
 
@@ -161,6 +177,10 @@ window.bind('<f>', lambda event: window.attributes('-fullscreen', False))
 label = Label(window, text="Score:{}".format(score), font=('Consolas', 40))
 label.pack()
 
+instructions = Label(window, text="Press esc to close the game!\nPress f to exit full screen!")
+instructions.pack(side=BOTTOM)
+
+
 canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
 canvas.pack()
 
@@ -181,9 +201,7 @@ window.bind('<Right>', lambda event: ChangeDirection('right'))
 window.bind('<Up>', lambda event: ChangeDirection('up'))
 window.bind('<Down>', lambda event: ChangeDirection('down'))
 
-snake = Snake()
-food = Food()
+CountDown(3)
 
-NextTurn(snake, food)
 
 window.mainloop()
