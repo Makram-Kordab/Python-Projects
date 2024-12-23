@@ -146,6 +146,7 @@ def ResetGame():
         HighScore = score
     
     score = 0
+    label.config(text="Score:{}".format(score))
     direction = 'down'
     
     canvas.delete(ALL)
