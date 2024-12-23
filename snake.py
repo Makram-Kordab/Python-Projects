@@ -12,7 +12,6 @@ FOOD_COLOR = "#FF0000"
 BACKGROUND_COLOR = "#000000"
 score = 0
 direction = 'down'
-HighScore = 0
 
 
 
@@ -140,10 +139,7 @@ def StartGame():
     NextTurn(snake, food)
 
 def ResetGame():
-    global score, direction, snake, food, HighScore
-    
-    if score>HighScore:
-        HighScore = score
+    global score, direction, snake, food
     
     score = 0
     label.config(text="Score:{}".format(score))
@@ -165,44 +161,60 @@ def GameOver():
     canvas.create_window(tempwidth, tempheight, window=PlayAgain)
     
 
+def InGame():
+    
+    global canvas, label
+    
+    for widget in window.winfo_children():
+        widget.destroy()
+    
+    label = Label(window, text="Score:{}".format(score), font=('Consolas', 40))
+    label.pack()
+        
+    canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
+    canvas.pack()
+    
+    instructions = Label(window, text="Press esc to close the game!\nPress f to enter full screen!")
+    instructions.pack(side=BOTTOM)
+    
+        
+    window.update()
+    
+    window_width = window.winfo_width()
+    window_height = window.winfo_height()
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    
+    x = int((screen_width/2) - (window_width/2))
+    y = int((screen_height/2) - (window_height/2))
+    
+    window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    
+    window.bind('<Left>', lambda event: ChangeDirection('left'))
+    window.bind('<Right>', lambda event: ChangeDirection('right'))
+    window.bind('<Up>', lambda event: ChangeDirection('up'))
+    window.bind('<Down>', lambda event: ChangeDirection('down'))
+    
+    CountDown(3)
+
+
 
 window = Tk()
 window.title("Snake game")
 window.resizable(True, True)
-window.minsize(GAME_WIDTH, GAME_HEIGHT+72)
-window.attributes('-fullscreen',True)
+window.minsize(GAME_WIDTH, GAME_HEIGHT+110)
+window.attributes('-fullscreen',False)
 window.bind('<Escape>', lambda event: window.destroy())
-window.bind('<f>', lambda event: window.attributes('-fullscreen', False))
+window.bind('<f>', lambda event: window.attributes('-fullscreen', True))
 
 
-label = Label(window, text="Score:{}".format(score), font=('Consolas', 40))
-label.pack()
+GameName = Label(window, text="Snake Game", font=('Comic Sans MS',70), fg="red")
+GameName.pack()
 
-instructions = Label(window, text="Press esc to close the game!\nPress f to exit full screen!")
-instructions.pack(side=BOTTOM)
+ProducedBy = Label(window, text="produced by Makram Kordab", font=('Arial',20))
+ProducedBy.pack()
 
-
-canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
-canvas.pack()
-
-window.update()
-
-window_width = window.winfo_width()
-window_height = window.winfo_height()
-screen_width = window.winfo_screenwidth()
-screen_height = window.winfo_screenheight()
-
-x = int((screen_width/2) - (window_width/2))
-y = int((screen_height/2) - (window_height/2))
-
-window.geometry(f"{window_width}x{window_height}+{x}+{y}")
-
-window.bind('<Left>', lambda event: ChangeDirection('left'))
-window.bind('<Right>', lambda event: ChangeDirection('right'))
-window.bind('<Up>', lambda event: ChangeDirection('up'))
-window.bind('<Down>', lambda event: ChangeDirection('down'))
-
-CountDown(3)
-
+PlayNow = Button(window, text="Play Now", font=('Comic Sans MS', 70), command=InGame, bg="black", fg="red", activebackground="gray", activeforeground="white")
+PlayNow.pack()
 
 window.mainloop()
