@@ -3,12 +3,15 @@ import random
 
 GAME_WIDTH = 800
 GAME_HEIGHT = 600
-SPEED = 80
+SPEED = 200
 SPACE_SIZE = 40
 BODY_PARTS = 3
 SNAKE_COLOR = "#00FF00"
 FOOD_COLOR = "#FF0000"
 BACKGROUND_COLOR = "#000000"
+score = 0
+direction = 'down'
+HighScore = 0
 
 
 class Snake:
@@ -38,7 +41,7 @@ class Food:
         canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=FOOD_COLOR, tag="food")
 
 
-def next_turn(snake, food):
+def NextTurn(snake, food):
 
     x, y = snake.coordinates[0]
 
@@ -77,14 +80,14 @@ def next_turn(snake, food):
 
         del snake.squares[-1]
 
-    if check_collisions(snake):
-        game_over()
+    if CheckCollisions(snake):
+        GameOver()
 
     else:
-        window.after(SPEED, next_turn, snake, food)
+        window.after(SPEED, NextTurn, snake, food)
 
 
-def change_direction(new_direction):
+def ChangeDirection(new_direction):
 
     global direction
 
@@ -102,7 +105,7 @@ def change_direction(new_direction):
             direction = new_direction
 
 
-def check_collisions(snake):
+def CheckCollisions(snake):
 
     x, y = snake.coordinates[0]
 
@@ -118,21 +121,44 @@ def check_collisions(snake):
     return False
 
 
-def game_over():
+def ResetGame():
+    global score, direction, snake, food, HighScore
+    
+    if score>HighScore:
+        HighScore = score
+    
+    score = 0
+    direction = 'down'
+    
+    canvas.delete(ALL)
+    snake = Snake()
+    food = Food()
+    NextTurn(snake, food)
+
+def GameOver():
 
     canvas.delete(ALL)
-    canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2,
-                       font=('consolas',70), text="GAME OVER", fill="red", tag="gameover")
+    
+    tempwidth = canvas.winfo_width()/2
+    tempheight = canvas.winfo_height()/2
+    
+    canvas.create_text(tempwidth, (tempheight)-190, font=('Comic Sans MS',70), text="GAME OVER", fill="red", tag="gameover")
+    
+    PlayAgain = Button(window, text="Play Again", font=('Comic Sans MS', 40), command=ResetGame, bg="gray", fg="red")
+    canvas.create_window(tempwidth, tempheight, window=PlayAgain)
+    
 
 
 window = Tk()
 window.title("Snake game")
-window.resizable(False, False)
+window.resizable(True, True)
+window.minsize(GAME_WIDTH, GAME_HEIGHT+72)
+window.attributes('-fullscreen',True)
+window.bind('<Escape>', lambda event: window.destroy())
+window.bind('<f>', lambda event: window.attributes('-fullscreen', False))
 
-score = 0
-direction = 'down'
 
-label = Label(window, text="Score:{}".format(score), font=('consolas', 40))
+label = Label(window, text="Score:{}".format(score), font=('Consolas', 40))
 label.pack()
 
 canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
@@ -150,14 +176,14 @@ y = int((screen_height/2) - (window_height/2))
 
 window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
-window.bind('<Left>', lambda event: change_direction('left'))
-window.bind('<Right>', lambda event: change_direction('right'))
-window.bind('<Up>', lambda event: change_direction('up'))
-window.bind('<Down>', lambda event: change_direction('down'))
+window.bind('<Left>', lambda event: ChangeDirection('left'))
+window.bind('<Right>', lambda event: ChangeDirection('right'))
+window.bind('<Up>', lambda event: ChangeDirection('up'))
+window.bind('<Down>', lambda event: ChangeDirection('down'))
 
 snake = Snake()
 food = Food()
 
-next_turn(snake, food)
+NextTurn(snake, food)
 
 window.mainloop()
